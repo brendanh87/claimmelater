@@ -1,5 +1,7 @@
 import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+import tensorflow_addons as tfa
 from tensorflow.keras import Model
 from preprocess import get_data
 
@@ -41,5 +43,9 @@ class Model(tf.keras.Model):
         pass
 
 
-    def loss(self, probs):
-        pass
+    def loss(self, feature1, feature2, labels, margin=1.0):
+        # get the difference of the two feature vectors
+        predictions = tf.linalg.norm(feature1 - feature2, axis=1)
+        # get the contrastive loss
+        loss = tf.math.reduce_mean(tfa.losses.contrastive_loss(labels, predictions, margin=margin))
+        return loss

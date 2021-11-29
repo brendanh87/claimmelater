@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 # Builds a dictionary with three fields id pair and same, which each contain a list where each list index is a docpair
 def get_data(inputs_file_path, labels_file_path):
-    
+
     # create entries that are lists of ids and boolean flags
     di = {}
     di['id'] = []
@@ -39,9 +39,19 @@ def get_data(inputs_file_path, labels_file_path):
             di['same'].append(data['same'])
 
     # get the features!
-    features = vectorizer.fit_transform(arr)        
+    features = vectorizer.fit_transform(arr).toarray()     
+
+    # load into txt file
+    with open("hw7/code/count-vectors.txt", 'w') as f:
+        f.truncate()
+        np.savetxt(f, features)  
 
     # return the dictionary and the number of examples
     return di, count, features
-  
-get_data("data/pan20-authorship-verification-training-small.jsonl", "data/pan20-authorship-verification-training-small-truth.jsonl")    
+
+# to save time, this function reads the count-vectors.txt file to get the features
+def read_count_vectors(vectors_file_path):
+    features = np.loadtxt(vectors_file_path)
+    print(features.shape)
+
+read_count_vectors("hw7/code/count-vectors.txt")
