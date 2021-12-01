@@ -1,12 +1,13 @@
 import tensorflow as tf
 import numpy as np
 import tensorflow as tf
-# import tensorflow_addons as tfa
+import tensorflow_addons as tfa
 from tensorflow import keras
 from tensorflow.keras import Model
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras import metrics
+from preprocess import read_data
 
 class Model(tf.keras.Model):
  
@@ -82,11 +83,11 @@ class Model(tf.keras.Model):
 
 def main():
     model = Model()
-    model.subnetwork.summary()
-    model.siamese.summary()
-    model.classifier.summary()
-    # model.siamese.compile(loss = metrics.contrastive_loss, optimizer = model.optimizer)
-    # model.siamese.fit([inputs[0], inputs[1]], labels, batch_size = model.batch_size)
+    
+    train_inputs, test_inputs, train_labels, test_labels = read_data('hw7/code/count-vectors.npy', 'hw7/code/labels.npy')
+
+    model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
+    model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, batch_size = model.batch_size)
 
 if __name__ == '__main__':
     main()
