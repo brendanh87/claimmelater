@@ -66,6 +66,10 @@ def read_data(vectors_file_path, labels_file_path):
     train_inputs, test_inputs = np.split(features, [int(0.7 * len(features))])
     train_labels, test_labels = np.split(labels, [int(0.7 * len(labels))])
 
+    # reshape the inputs into pairs
+    train_inputs = np.reshape(train_inputs, (-1, 2, train_inputs.shape[-1]))
+    test_inputs = np.reshape(test_inputs, (-1, 2, test_inputs.shape[-1]))
+
     return train_inputs, test_inputs, train_labels, test_labels
 
 
