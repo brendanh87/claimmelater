@@ -132,3 +132,4 @@ dmypy.json
 data/
 
 hw7/code/count-vectors.txt
+hw7/code/count-vectors.npy

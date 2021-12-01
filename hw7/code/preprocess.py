@@ -41,17 +41,17 @@ def get_data(inputs_file_path, labels_file_path):
     # get the features!
     features = vectorizer.fit_transform(arr).toarray()     
 
-    # load into txt file
-    with open("hw7/code/count-vectors.txt", 'w') as f:
+    # load into a .npy file
+    with open("hw7/code/count-vectors.npy", 'wb') as f:
         f.truncate()
-        np.savetxt(f, features)  
+        np.save(f, features)  
 
-    # return the dictionary and the number of examples
+    # return the dictionary, num_examples, and the features
     return di, count, features
 
 # to save time, this function reads the count-vectors.txt file to get the features
 def read_count_vectors(vectors_file_path):
-    features = np.loadtxt(vectors_file_path)
-    print(features.shape)
+    features = np.load(vectors_file_path)
+    return features
 
-read_count_vectors("hw7/code/count-vectors.txt")
+get_data('data/pan20-authorship-verification-training-small.jsonl', 'data/pan20-authorship-verification-training-small-truth.jsonl')

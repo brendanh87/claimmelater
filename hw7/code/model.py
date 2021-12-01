@@ -6,9 +6,7 @@ from tensorflow import keras
 from tensorflow.keras import Model
 from tensorflow.keras import layers
 from tensorflow.keras import Lambda
-from preprocess import get_data
 from tensorflow.keras import metrics
-
 
 class Model(tf.keras.Model):
  
@@ -25,8 +23,6 @@ class Model(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
         self.embedding_size = (1, 11675)
         self.batch_size = 120
-        # self.siamese_hidden_dim = 512
-        # self.classifier_hidden_dim = 256
 
         # Subnetwork model
         subnetwork_input = keras.Input(self.embedding_size)
