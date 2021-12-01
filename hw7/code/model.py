@@ -50,7 +50,7 @@ class Model(tf.keras.Model):
         # classifier model
         siameseA_output = keras.Input(shape = (1, 512))
         siameseB_output = keras.Input(shape = (1, 512))
-        z = layers.Subtract([subnetwork_one_input, subnetwork_two_input])
+        z = layers.Subtract([siameseA_output, siameseB_output])
         z = layers.Dense((1,512), activation = 'relu')(z)
         z = layers.BatchNormalization()(z)
         z = layers.Dense((1,512), activation = 'relu')(z)
