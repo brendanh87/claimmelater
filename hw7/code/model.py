@@ -38,12 +38,12 @@ class Model(tf.keras.Model):
         self.subnetwork = keras.Model(inputs = subnetwork_input, outputs = x, name = "subnetwork")
 
         # Siamese network
-        siameseA_input = keras.Input(shape = (1, 11675))
+        siameseA_input = keras.Input(shape = (1, 11675), name = "encoded_doc_A")
         siameseA_output = self.subnetwork(siameseA_input)
-        siameseB_input = keras.Input(shape = (1, 11675))
+        siameseB_input = keras.Input(shape = (1, 11675), name = "encoded_doc_B")
         siameseB_output = self.subnetwork(siameseB_input)
         subtracted = layers.Subtract()([siameseA_output, siameseB_output])
-        distance = Lambda(tf.norm)(subtracted)
+        distance = Lambda(tf.norm, output_shape = (1), name = "euclid_distance")(subtracted)
         self.siamese = keras.Model(inputs = [siameseA_input, siameseB_input], 
                                    outputs = distance,
                                    name = 'siamese')
@@ -80,8 +80,13 @@ class Model(tf.keras.Model):
     #     loss = tf.math.reduce_mean(tfa.losses.contrastive_loss(labels, predictions, margin=margin))
     #     return loss
 
-model = Model()
-print(model.siamese.summary())
-model.classifier.summary()
+def main():
+    model = Model()
+    model.subnetwork.summary()
+    model.siamese.summary()
+    model.classifier.summary()
     # model.siamese.compile(loss = metrics.contrastive_loss, optimizer = model.optimizer)
     # model.siamese.fit([inputs[0], inputs[1]], labels, batch_size = model.batch_size)
+
+if __name__ == '__main__':
+    main()

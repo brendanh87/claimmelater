@@ -70,3 +70,4 @@ def read_data(vectors_file_path, labels_file_path):
 
 
 # TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
+get_data('/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small.jsonl', '/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small-truth.jsonl') 
