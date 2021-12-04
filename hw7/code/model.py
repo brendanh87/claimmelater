@@ -22,11 +22,11 @@ class Model(tf.keras.Model):
         self.learning_rate = 0.001
         self.res_layer_count = 8
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
-        self.embedding_size = (1, 11675)
+        self.embedding_size = (1, 8736)
         self.batch_size = 120
 
         # Subnetwork model
-        subnetwork_input = keras.Input(shape = (1, 11675))
+        subnetwork_input = keras.Input(shape = self.embedding_size)
         x = layers.BatchNormalization()(subnetwork_input)
         x = layers.GaussianNoise(stddev=0.1)(x)
         x = layers.Dropout(rate=0.3)(x)
@@ -39,9 +39,9 @@ class Model(tf.keras.Model):
         self.subnetwork = keras.Model(inputs = subnetwork_input, outputs = x, name = "subnetwork")
 
         # Siamese network
-        siameseA_input = keras.Input(shape = (1, 11675), name = "encoded_doc_A")
+        siameseA_input = keras.Input(shape = self.embedding_size, name = "encoded_doc_A")
         siameseA_output = self.subnetwork(siameseA_input)
-        siameseB_input = keras.Input(shape = (1, 11675), name = "encoded_doc_B")
+        siameseB_input = keras.Input(shape = self.embedding_size, name = "encoded_doc_B")
         siameseB_output = self.subnetwork(siameseB_input)
         subtracted = layers.Subtract()([siameseA_output, siameseB_output])
         distance = Lambda(tf.norm, output_shape = (1), name = "euclid_distance")(subtracted)
