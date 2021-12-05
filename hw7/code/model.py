@@ -22,7 +22,7 @@ class Model(tf.keras.Model):
         self.learning_rate = 0.001
         self.res_layer_count = 8
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
-        self.embedding_size = (1, 8736)
+        self.embedding_size = (8736)
         self.batch_size = 120
 
         # Subnetwork model
@@ -87,7 +87,9 @@ def main():
     train_inputs, test_inputs, train_labels, test_labels = read_data('hw7/code/count-vectors.npy', 'hw7/code/labels.npy')
 
     model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
-    model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, batch_size = model.batch_size)
+    history = model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels[:], batch_size = model.batch_size)
+    test_scores = model.siamese.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels[:], verbose=2)
+    print("Test loss:", test_scores)
 
 if __name__ == '__main__':
     main()

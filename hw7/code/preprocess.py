@@ -75,11 +75,7 @@ def read_data(vectors_file_path, labels_file_path):
     return train_inputs, test_inputs, train_labels, test_labels
 
 
-<<<<<<< HEAD
 # TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
 #get_data('/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small.jsonl', '/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small-truth.jsonl') 
 
 read_data('hw7/code/count-vectors.npy', 'hw7/code/labels.npy')
-=======
-# TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
->>>>>>> de34e7cb29261799a8cd933952e422f248f6da79
