@@ -1,12 +1,13 @@
 import tensorflow as tf
 import numpy as np
 import tensorflow as tf
-# import tensorflow_addons as tfa
+import tensorflow_addons as tfa
 from tensorflow import keras
 from tensorflow.keras import Model
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras import metrics
+from preprocess import read_data
 
 class Model(tf.keras.Model):
  
@@ -21,11 +22,11 @@ class Model(tf.keras.Model):
         self.learning_rate = 0.001
         self.res_layer_count = 8
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
-        self.embedding_size = (1, 11675)
+        self.embedding_size = (1, 8736)
         self.batch_size = 120
 
         # Subnetwork model
-        subnetwork_input = keras.Input(shape = (1, 11675))
+        subnetwork_input = keras.Input(shape = self.embedding_size)
         x = layers.BatchNormalization()(subnetwork_input)
         x = layers.GaussianNoise(stddev=0.1)(x)
         x = layers.Dropout(rate=0.3)(x)
@@ -38,9 +39,9 @@ class Model(tf.keras.Model):
         self.subnetwork = keras.Model(inputs = subnetwork_input, outputs = x, name = "subnetwork")
 
         # Siamese network
-        siameseA_input = keras.Input(shape = (1, 11675), name = "encoded_doc_A")
+        siameseA_input = keras.Input(shape = self.embedding_size, name = "encoded_doc_A")
         siameseA_output = self.subnetwork(siameseA_input)
-        siameseB_input = keras.Input(shape = (1, 11675), name = "encoded_doc_B")
+        siameseB_input = keras.Input(shape = self.embedding_size, name = "encoded_doc_B")
         siameseB_output = self.subnetwork(siameseB_input)
         subtracted = layers.Subtract()([siameseA_output, siameseB_output])
         distance = Lambda(tf.norm, output_shape = (1), name = "euclid_distance")(subtracted)
@@ -82,11 +83,11 @@ class Model(tf.keras.Model):
 
 def main():
     model = Model()
-    model.subnetwork.summary()
-    model.siamese.summary()
-    model.classifier.summary()
-    # model.siamese.compile(loss = metrics.contrastive_loss, optimizer = model.optimizer)
-    # model.siamese.fit([inputs[0], inputs[1]], labels, batch_size = model.batch_size)
+    
+    train_inputs, test_inputs, train_labels, test_labels = read_data('hw7/code/count-vectors.npy', 'hw7/code/labels.npy')
+
+    model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
+    model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, batch_size = model.batch_size)
 
 if __name__ == '__main__':
     main()
