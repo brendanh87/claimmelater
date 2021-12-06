@@ -70,7 +70,12 @@ def read_data(vectors_file_path, labels_file_path):
     train_inputs = np.reshape(train_inputs, (-1, 2, train_inputs.shape[-1]))
     test_inputs = np.reshape(test_inputs, (-1, 2, test_inputs.shape[-1]))
 
+    print(train_inputs.shape, test_inputs.shape, train_labels.shape, test_labels.shape)
+
     return train_inputs, test_inputs, train_labels, test_labels
 
 
 # TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
+#get_data('/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small.jsonl', '/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small-truth.jsonl') 
+
+read_data('hw7/code/count-vectors.npy', 'hw7/code/labels.npy')
