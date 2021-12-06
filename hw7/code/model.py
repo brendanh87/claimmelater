@@ -152,15 +152,6 @@ def main():
     all_history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.siamese_epochs, batch_size = model.batch_size)
     model.classifier.save_weights('split_model_weights')
 
-    # summarize history for loss
-    # plt.plot(history.history['loss'])
-    # plt.title('model loss')
-    # plt.ylabel('loss')
-    # plt.xlabel('epoch')
-    # plt.ylim(0, 1.2)
-    # plt.legend(['train', 'test'], loc='upper left')
-    # plt.show()
-
   
 if __name__ == '__main__':
     main()
