@@ -38,12 +38,12 @@ def get_data(inputs_file_path, labels_file_path):
     features = vectorizer.fit_transform(arr).toarray()     
 
     # load features into a .npy file
-    with open('hw7/code/count-vectors.npy', 'wb') as f:
+    with open('count-vectors.npy', 'wb') as f:
         f.truncate()
         np.save(f, features)
 
     # load labels into a .npy file
-    with open('hw7/code/labels.npy', 'wb') as f:
+    with open('labels.npy', 'wb') as f:
         f.truncate()
         np.save(f, labels)     
 
@@ -77,6 +77,4 @@ def read_data(vectors_file_path, labels_file_path):
 
     return train_inputs, test_inputs, train_labels, test_labels
 
-
 # TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
-# get_data('/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small.jsonl', '/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small-truth.jsonl') 
