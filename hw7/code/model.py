@@ -119,18 +119,38 @@ def main():
     # test the model
     test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
 
+    # ====== METHOD 2: TRAINING THE SIAMESE SEPARATELY =====
 
-    # # compile the model
-    # model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
-    # # train the model
-    # history = model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=30, batch_size = model.batch_size)
-    # # test the model
-    # test_scores = model.siamese.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels[:], verbose=2)
-    # # print out test score
-    # print('Test loss:', test_scores)
+    # ---- TRAINING AND SAVING: COMMENT OUT IF LOADING IN SIAMESE ----
+    # compile the siamese model
+    model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
+    # train the siamese model
+    siamese_history = model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.epochs, batch_size = model.batch_size)
+    model.siamese.save_weights('siamese_model_weights')
 
-    # save the model
-    # model.save('saveItBoi')
+    # summarize history for loss
+    plt.plot(siamese_history.history['loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.ylim(0, 1.2)
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    #---------------
+
+    # # ---- LOADING SIAMESE: COMMENT OUT IF TRAINING AND SAVING ----
+    # model.siamese.load_weights('siamese_model_weights')
+    # # ----------------------
+
+    # ===== METHOD 2B: FREEZING SIAMESE NETWORK BEFORE TRAINING CLASSIFIER =====
+    model.siamese.trainable = False
+    # ===================================
+
+    # ---- TRAINING AND SAVING CLASSIFIER: COMMENT OUT IF LOADING IN ----
+    # compile classifier model
+    model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
+    all_history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.siamese_epochs, batch_size = model.batch_size)
+    model.classifier.save_weights('split_model_weights')
 
     # summarize history for loss
     # plt.plot(history.history['loss'])
@@ -141,5 +161,6 @@ def main():
     # plt.legend(['train', 'test'], loc='upper left')
     # plt.show()
 
+  
 if __name__ == '__main__':
     main()
