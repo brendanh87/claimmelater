@@ -21,7 +21,7 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         # intialize the optimizer
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.res_layer_count = 8
         self.optimizer = tfa.optimizers.RectifiedAdam(self.learning_rate)
         self.embedding_size = (8736)
@@ -112,11 +112,10 @@ def main():
     # get the data from preprocessing
     train_inputs, test_inputs, train_labels, test_labels = read_data('count-vectors.npy', 'labels.npy')
 
-
     # compile the model
     model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
     # train the model
-    # history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=1, batch_size = model.batch_size)
+    history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs = 5, batch_size = model.batch_size)
     # test the model
     test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
 
@@ -134,13 +133,13 @@ def main():
     # model.save('saveItBoi')
 
     # summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.ylim(0, 1.2)
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    # plt.plot(history.history['loss'])
+    # plt.title('model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # plt.ylim(0, 1.2)
+    # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
 
 if __name__ == '__main__':
     main()
