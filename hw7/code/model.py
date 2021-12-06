@@ -21,9 +21,7 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         # intialize the optimizer
-        self.epochs = 30
-        self.siamese_epochs = 10
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.res_layer_count = 8
         self.optimizer = tfa.optimizers.RectifiedAdam(self.learning_rate)
         self.embedding_size = (8736)
@@ -114,32 +112,12 @@ def main():
     # get the data from preprocessing
     train_inputs, test_inputs, train_labels, test_labels = read_data('count-vectors.npy', 'labels.npy')
 
-    # # ===== METHOD 1: TRAINING THE WHOLE MODEL THROUGH ======
-    # # compile the model
-    # model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
-    
-    # # ---- TRAINING AND SAVING: COMMENT OUT IF LOADING IN A MODEL ----
-    # # train and save the model
-    # history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.epochs, batch_size = model.batch_size)
-    # model.classifier.save_weights('trained_model_weights')
-
-    # # summarize history for loss
-    # plt.plot(history.history['loss'])
-    # plt.title('model loss')
-    # plt.ylabel('loss')
-    # plt.xlabel('epoch')
-    # plt.ylim(0, 1.2)
-    # plt.legend(['train', 'test'], loc='upper left')
-    # plt.show()
-    # #---------------
-
-    # # # ---- LOADING IN: COMMENT OUT IF TRAINING AND SAVING ---
-    # # # load the model if necessary
-    # # model.classifier.load_weights('whole_model_weights')
-    # # # ------------
-
-    # # test the model
-    # test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=1, batch_size = model.batch_size)
+    # compile the model
+    model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
+    # train the model
+    history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs = 5, batch_size = model.batch_size)
+    # test the model
+    test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
 
     # ====== METHOD 2: TRAINING THE SIAMESE SEPARATELY =====
 
@@ -175,21 +153,13 @@ def main():
     model.classifier.save_weights('split_model_weights')
 
     # summarize history for loss
-    plt.plot(all_history.history['loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.ylim(0, 1.2)
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-    #---------------
-
-    # # ---- LOADING CLASSIFIIER: COMMENT OUT IF TRAINING AND SAVING ----
-    # model.classifier.load_weights('split_model_weights')
-    # # ----------------------
-
-    # test the model
-    test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=1, batch_size = model.batch_size)
+    # plt.plot(history.history['loss'])
+    # plt.title('model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # plt.ylim(0, 1.2)
+    # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
 
   
 if __name__ == '__main__':

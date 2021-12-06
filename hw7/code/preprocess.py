@@ -2,6 +2,7 @@ import gzip
 import numpy as np
 import json as js
 from sklearn.feature_extraction.text import CountVectorizer
+import tensorflow as tf
 
 # Builds a dictionary with three fields id pair and same, which each contain a list where each list index is a docpair
 def get_data(inputs_file_path, labels_file_path):
@@ -62,20 +63,18 @@ def read_data(vectors_file_path, labels_file_path):
     features = features[:-features_to_cut_off]
     labels = labels[:-labels_to_cut_off]
 
+    # reshape the features into pairs
+    features = np.reshape(features, (-1, 2, features.shape[-1]))
+
+    # shuffle the data
+    randomize = tf.random.shuffle(tf.range(len(features)))
+    features = tf.gather(features, randomize)
+    labels = tf.gather(labels, randomize)
+
     # split the training/testing data 70/30
     train_inputs, test_inputs = np.split(features, [int(0.7 * len(features))])
     train_labels, test_labels = np.split(labels, [int(0.7 * len(labels))])
 
-    # reshape the inputs into pairs
-    train_inputs = np.reshape(train_inputs, (-1, 2, train_inputs.shape[-1]))
-    test_inputs = np.reshape(test_inputs, (-1, 2, test_inputs.shape[-1]))
-
-    print(train_inputs.shape, test_inputs.shape, train_labels.shape, test_labels.shape)
-
     return train_inputs, test_inputs, train_labels, test_labels
 
-
 # TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
-#get_data('/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small.jsonl', '/Users/alyssamarie/Desktop/School/cs1470/claimmelater/data/pan20-authorship-verification-training-small-truth.jsonl') 
-
-# read_data('count-vectors.npy', 'labels.npy')
