@@ -3,10 +3,12 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 from tensorflow import keras
+from tensorflow.keras import backend as K
 from tensorflow.keras import Model
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras import metrics
+import matplotlib.pyplot as plt
 from preprocess import read_data
 
 class Model(tf.keras.Model):
@@ -21,15 +23,15 @@ class Model(tf.keras.Model):
         # intialize the optimizer
         self.learning_rate = 0.001
         self.res_layer_count = 8
-        self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
-        self.embedding_size = (1, 8736)
+        self.optimizer = tfa.optimizers.RectifiedAdam(self.learning_rate)
+        self.embedding_size = (8736)
         self.batch_size = 120
 
         # Subnetwork model
         subnetwork_input = keras.Input(shape = self.embedding_size)
         x = layers.BatchNormalization()(subnetwork_input)
-        x = layers.GaussianNoise(stddev=0.1)(x)
-        x = layers.Dropout(rate=0.3)(x)
+        x = layers.GaussianNoise(stddev=0.00001)(x)
+        x = layers.Dropout(rate=0.9)(x)
         x = layers.Dense(units = 512)(x)
 
         # residual layer
@@ -49,8 +51,8 @@ class Model(tf.keras.Model):
                                    outputs = distance,
                                    name = 'siamese')
         # classifier model
-        siameseA_output = keras.Input(shape = (1, 512))
-        siameseB_output = keras.Input(shape = (1, 512))
+        # siameseA_output = keras.Input(shape = (1, 512))
+        # siameseB_output = keras.Input(shape = (1, 512))
         z = layers.Subtract()([siameseA_output, siameseB_output])
         z = layers.Dense(512, activation = 'relu')(z)
         z = layers.BatchNormalization()(z)
@@ -58,7 +60,8 @@ class Model(tf.keras.Model):
         z = layers.BatchNormalization()(z)
         z = layers.Dense(512, activation = 'relu')(z)
         classifier_output = layers.Dense(1, activation = 'sigmoid')(z)
-        self.classifier = keras.Model(inputs = [siameseA_output, siameseB_output], outputs = classifier_output, name = 'classifier')
+        # self.classifier = keras.Model(inputs = [siameseA_output, siameseB_output], outputs = classifier_output, name = 'classifier')
+        self.classifier = keras.Model(inputs = [siameseA_input, siameseB_input], outputs = classifier_output, name = 'classifier')
 
     def residual_block(self, input):
         x = layers.Dense(512)(input)
@@ -70,24 +73,74 @@ class Model(tf.keras.Model):
 
         return x   
 
-    # def call(self, inputs, labels):
-    #     self.siamese.compile(loss = metrics.contrastive_loss, optimizer = self.optimizer)
-    #     self.siamese.fit([inputs[0], inputs[1]], labels, batch_size = self.batch_size)
+def f1(y_true, y_pred):
 
+    def recall(y_true, y_pred):
+        """Recall metric.
 
-    # def loss(self, feature1, feature2, labels, margin=1.0):
-    #     # get the difference of the two feature vectors
-    #     # get the contrastive loss
-    #     loss = tf.math.reduce_mean(tfa.losses.contrastive_loss(labels, predictions, margin=margin))
-    #     return loss
+        Only computes a batch-wise average of recall.
+
+        Computes the recall, a metric for multi-label classification of
+        how many relevant items are selected.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        """Precision metric.
+
+        Only computes a batch-wise average of precision.
+
+        Computes the precision, a metric for multi-label classification of
+        how many selected items are relevant.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 def main():
+    # instantiate model
     model = Model()
     
-    train_inputs, test_inputs, train_labels, test_labels = read_data('hw7/code/count-vectors.npy', 'hw7/code/labels.npy')
+    # get the data from preprocessing
+    train_inputs, test_inputs, train_labels, test_labels = read_data('count-vectors.npy', 'labels.npy')
 
-    model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
-    model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, batch_size = model.batch_size)
+
+    # compile the model
+    model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
+    # train the model
+    # history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=1, batch_size = model.batch_size)
+    # test the model
+    test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
+
+
+    # # compile the model
+    # model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
+    # # train the model
+    # history = model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=30, batch_size = model.batch_size)
+    # # test the model
+    # test_scores = model.siamese.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels[:], verbose=2)
+    # # print out test score
+    # print('Test loss:', test_scores)
+
+    # save the model
+    # model.save('saveItBoi')
+
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.ylim(0, 1.2)
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
 
 if __name__ == '__main__':
     main()
