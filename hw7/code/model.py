@@ -244,7 +244,9 @@ def main():
         history = train_whole_model(model, train_inputs, train_labels, freeze_siamese=True)
 
     # test the model
-    print(test(model, test_inputs, test_labels))    
+    print(test(model, test_inputs, test_labels))
+
+    visualize_data(history)    
   
 if __name__ == '__main__':
     main()
