@@ -221,7 +221,7 @@ def main():
 
     if sys.argv[2] not in {"WHOLE", "SPLIT", "FREEZESPLIT"}:
         print("USAGE: python model.py <Model Type> <Training Type>")
-        print("<Training Type>: [WHOLE/SPLIT]")
+        print("<Training Type>: [WHOLE/SPLIT/FREEZESPLIT]")
         exit()    
 
     # create model based on parameter
@@ -246,6 +246,7 @@ def main():
     # test the model
     print(test(model, test_inputs, test_labels))
 
+    # graph loss over training
     visualize_data(history)    
   
 if __name__ == '__main__':
