@@ -10,10 +10,11 @@ from tensorflow.keras.layers import Lambda
 from tensorflow.keras import metrics
 import matplotlib.pyplot as plt
 from preprocess import read_data
+from tensorflow.keras.utils import plot_model
 
 class Model(tf.keras.Model):
  
-    def __init__(self):
+    def __init__(self, is_convolution = False):
         """
         The Model class predicts if the two texts are written by the same author.
         """
@@ -21,13 +22,15 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         # intialize the optimizer
-        self.learning_rate = 0.01
-        self.epochs = 30
+        self.learning_rate = 0.001
+        self.epochs = 100
         self.siamese_epochs = 10
         self.res_layer_count = 8
         self.optimizer = tfa.optimizers.RectifiedAdam(self.learning_rate)
         self.embedding_size = (8736)
         self.batch_size = 120
+
+        self.is_convolution = is_convolution
 
         # Subnetwork model
         subnetwork_input = keras.Input(shape = self.embedding_size)
@@ -37,8 +40,13 @@ class Model(tf.keras.Model):
         x = layers.Dense(units = 512)(x)
 
         # residual layer
-        for i in range(self.res_layer_count):
-            x = self.residual_block(x)
+        if is_convolution == True:
+            x = tf.expand_dims(x, axis=2)
+            for i in range(self.res_layer_count):
+                x = self.residual_block_conv(x)
+        else:
+            for i in range(self.res_layer_count):
+                x = self.residual_block(x)             
 
         self.subnetwork = keras.Model(inputs = subnetwork_input, outputs = x, name = "subnetwork")
 
@@ -53,16 +61,14 @@ class Model(tf.keras.Model):
                                    outputs = distance,
                                    name = 'siamese')
         # classifier model
-        # siameseA_output = keras.Input(shape = (1, 512))
-        # siameseB_output = keras.Input(shape = (1, 512))
         z = layers.Subtract()([siameseA_output, siameseB_output])
         z = layers.Dense(512, activation = 'relu')(z)
         z = layers.BatchNormalization()(z)
         z = layers.Dense(512, activation = 'relu')(z)
         z = layers.BatchNormalization()(z)
         z = layers.Dense(512, activation = 'relu')(z)
+
         classifier_output = layers.Dense(1, activation = 'sigmoid')(z)
-        # self.classifier = keras.Model(inputs = [siameseA_output, siameseB_output], outputs = classifier_output, name = 'classifier')
         self.classifier = keras.Model(inputs = [siameseA_input, siameseB_input], outputs = classifier_output, name = 'classifier')
 
     def residual_block(self, input):
@@ -73,7 +79,15 @@ class Model(tf.keras.Model):
         x = layers.Subtract()([x, input])
         x = layers.Activation('relu')(x)
 
-        return x   
+        return x  
+
+    def residual_block_conv(self, input):
+        x = layers.Conv1D(32, 3, padding = 'same', input_shape=(512, 1))(input)
+        x = layers.BatchNormalization()(x)
+        x = layers.Subtract()([x, input])
+        x = layers.Activation('relu')(x)
+
+        return x       
 
 def f1(y_true, y_pred):
 
@@ -109,20 +123,20 @@ def f1(y_true, y_pred):
 
 def main():
     # instantiate model
-    model = Model()
+    model = Model(is_convolution = True)
     
     # get the data from preprocessing
     train_inputs, test_inputs, train_labels, test_labels = read_data('count-vectors.npy', 'labels.npy')
 
-    # ==== METHOD 1: TRAINING THE MODEL THROUGH ====
-    # ---- TRAINING AND SAVING: COMMENT OUT IF LOADING IN ----
-    # compile the model
+    # # ==== METHOD 1: TRAINING THE MODEL THROUGH ====
+    # # ---- TRAINING AND SAVING: COMMENT OUT IF LOADING IN ----
+    # # compile the model
     model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
-    # train the model
+    # # train the model
     history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs = model.epochs, batch_size = model.batch_size)
     model.classifier.save_weights('whole_model_weights')
 
-    # summarize history for loss
+    # # summarize history for loss
     plt.plot(history.history['loss'])
     plt.title('model loss')
     plt.ylabel('loss')
@@ -131,56 +145,56 @@ def main():
     plt.legend(['train', 'test'], loc='upper left')
     plt.show()
     
-    # # ---- LOADING: COMMENT OUT IF TRAINNG AND SAVING ----
-    # model.siamese.load_weights('whole_model_weights')
-    # # --------------------------
+    # # # ---- LOADING: COMMENT OUT IF TRAINNG AND SAVING ----
+    # model.classifier.load_weights('whole_model_weights')
+    # # # --------------------------
     
-    # test the model
-    test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
+    # # test the model
+    # test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
+    # print(test_scores)
 
-
-    # ====== METHOD 2: TRAINING THE SIAMESE SEPARATELY =====
-    # ---- TRAINING AND SAVING: COMMENT OUT IF LOADING IN SIAMESE ----
-    # compile the siamese model
-    model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
+    # # ====== METHOD 2: TRAINING THE SIAMESE SEPARATELY =====
+    # # ---- TRAINING AND SAVING: COMMENT OUT IF LOADING IN SIAMESE ----
+    # # compile the siamese model
+    # model.siamese.compile(loss = tfa.losses.contrastive_loss, optimizer = model.optimizer)
     # train the siamese model
-    siamese_history = model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.siamese_epochs, batch_size = model.batch_size)
-    model.siamese.save_weights('siamese_model_weights')
+    # siamese_history = model.siamese.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.siamese_epochs, batch_size = model.batch_size)
+    # model.siamese.save_weights('siamese_model_weights')
 
-    # summarize history for loss
-    plt.plot(siamese_history.history['loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.ylim(0, 1.2)
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-    #---------------
+    # # summarize history for loss
+    # plt.plot(siamese_history.history['loss'])
+    # plt.title('model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # plt.ylim(0, 1.2)
+    # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
+    # #---------------
 
     # # ---- LOADING SIAMESE: COMMENT OUT IF TRAINING AND SAVING ----
     # model.siamese.load_weights('siamese_model_weights')
     # # ----------------------
 
-    # ===== METHOD 2B: FREEZING SIAMESE NETWORK BEFORE TRAINING CLASSIFIER =====
-    model.siamese.trainable = False
-    # ===================================
+    # # ===== METHOD 2B: FREEZING SIAMESE NETWORK BEFORE TRAINING CLASSIFIER =====
+    # model.siamese.trainable = False
+    # # ===================================
 
-    # ---- TRAINING AND SAVING CLASSIFIER: COMMENT OUT IF LOADING IN ----
-    # compile classifier model
-    model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
-    all_history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.epochs, batch_size = model.batch_size)
-    model.classifier.save_weights('split_model_weights')
+    # # ---- TRAINING AND SAVING CLASSIFIER: COMMENT OUT IF LOADING IN ----
+    # # compile classifier model
+    # model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
+    # all_history = model.classifier.fit([train_inputs[:, 0], train_inputs[:, 1]], train_labels, epochs=model.epochs, batch_size = model.batch_size)
+    # model.classifier.save_weights('split_model_weights')
 
-    # summarize history for loss
-    plt.plot(all_history.history['loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.ylim(0, 1.2)
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    # # summarize history for loss
+    # plt.plot(all_history.history['loss'])
+    # plt.title('model loss')
+    # plt.ylabel('loss')
+    # plt.xlabel('epoch')
+    # plt.ylim(0, 1.2)
+    # plt.legend(['train', 'test'], loc='upper left')
+    # plt.show()
 
-    test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
+    # test_scores = model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
 
   
 if __name__ == '__main__':
