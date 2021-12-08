@@ -21,8 +21,10 @@ class Model(tf.keras.Model):
 
         Our siamese network is made up for two identical subnetworks with the first
         and second example are sent into. These subnetworks contain a number of 
-        residual blocks. If is_convolution is set to False, these blocks are made
-        up of dense layers. If is_convolution is set to True, these blocks are made
+        residual blocks: 
+        - If is_convolution is set to False, these blocks are made
+        up of dense layers. 
+        - If is_convolution is set to True, these blocks are made
         up of convolutional layers.
 
         We then take the absolute distance between the outputs of the subnetworks.
@@ -36,8 +38,8 @@ class Model(tf.keras.Model):
 
         # intialize hyperparameters and optimizer
         self.learning_rate = 0.001
-        self.epochs = 1
-        self.siamese_epochs = 1
+        self.epochs = 20
+        self.siamese_epochs = 80
         self.res_layer_count = 8
         self.embedding_size = (8736)
         self.batch_size = 120

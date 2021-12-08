@@ -3,6 +3,7 @@ import numpy as np
 import json as js
 from sklearn.feature_extraction.text import CountVectorizer
 import tensorflow as tf
+import pickle
 
 # Builds a dictionary with three fields id pair and same, which each contain a list where each list index is a docpair
 def get_data(inputs_file_path, labels_file_path):
