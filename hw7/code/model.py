@@ -211,7 +211,7 @@ def test(model, test_inputs, test_labels):
     """
     return model.classifier.evaluate([test_inputs[:, 0], test_inputs[:, 1]], test_labels, verbose=2)
 
-def visualize_data(history):
+def visualize_data(history, filename):
     """
     Plots the loss over epochs in training.
 
@@ -223,7 +223,7 @@ def visualize_data(history):
     plt.xlabel('epoch')
     plt.ylim(0, 1.2)
     plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    plt.savefig(filename)
 
 def main():
     # get the data from the specified files
@@ -260,14 +260,16 @@ def main():
         if sys.argv[2] == "WHOLE":
             history = train_whole_model(model, train_inputs, train_labels)
         elif sys.argv[2] == "SPLIT":
-            train_siamese_network(model, train_inputs, train_labels)    
+            siamese_history = train_siamese_network(model, train_inputs, train_labels)
+            visualize_data(siamese_history, "Siamese_{}_{}_C{}_S{}.png".format(sys.argv[1], sys.argv[2], model.epochs, model.siamese_epochs))
             history = train_whole_model(model, train_inputs, train_labels)
         elif sys.argv[2] == "FREEZESPLIT":
-            train_siamese_network(model, train_inputs, train_labels)   
+            siamese_history = train_siamese_network(model, train_inputs, train_labels) 
+            visualize_data(siamese_history, "Siamese_{}_{}_C{}_S{}.png".format(sys.argv[1], sys.argv[2], model.epochs, model.siamese_epochs))  
             history = train_whole_model(model, train_inputs, train_labels, freeze_siamese=True)
         
         # graph loss over training
-        visualize_data(history)   
+        visualize_data(history, "Classifier_{}_{}_C{}_S{}.png".format(sys.argv[1], sys.argv[2], model.epochs, model.siamese_epochs))
 
     # test the model
     test(model, test_inputs, test_labels)
