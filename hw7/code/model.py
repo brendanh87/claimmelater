@@ -1,4 +1,5 @@
 import sys
+import os
 import tensorflow as tf
 import numpy as np
 import tensorflow as tf
@@ -89,6 +90,14 @@ class Model(tf.keras.Model):
 
         # set up the cumulative classifier model
         self.classifier = keras.Model(inputs = [siameseA_input, siameseB_input], outputs = classifier_output, name = 'classifier')
+
+    def call(self, inputs):
+        """
+        Calls the model on a set of inputs
+        :param inputs: A list of two embedding_size vectors
+        :return: A [0,1] float value representing confidence of whether the two inputs are from the same author
+        """
+        return self.classifier([inputs[0], inputs[1]])
 
     def residual_block(self, input):
         """
@@ -188,6 +197,10 @@ def train_siamese_network(model, train_inputs, train_labels):
     # return siamese history
     return siamese_history
 
+def load_classifier_model(model, path_to_weights):
+    model.classifier.compile(loss = keras.losses.BinaryCrossentropy(), optimizer = model.optimizer, metrics=[tf.keras.metrics.BinaryAccuracy(), f1])
+    model.classifier.load_weights(path_to_weights).expect_partial()    
+
 def test(model, test_inputs, test_labels):
     """
     Evaluates the entire model.
@@ -217,14 +230,19 @@ def main():
     train_inputs, test_inputs, train_labels, test_labels = read_data('count-vectors.npy', 'labels.npy')   
 
     if sys.argv[1] not in {"CONV", "DENSE"}:
-        print("USAGE: python model.py <Model Type> <Training Type>")
+        print("USAGE: python model.py <Model Type> <Training Type> <Train/Load>")
         print("<Model Type>: [CONV/DENSE]")
         exit()
 
     if sys.argv[2] not in {"WHOLE", "SPLIT", "FREEZESPLIT"}:
-        print("USAGE: python model.py <Model Type> <Training Type>")
+        print("USAGE: python model.py <Model Type> <Training Type> <Train/Load>")
         print("<Training Type>: [WHOLE/SPLIT/FREEZESPLIT]")
-        exit()    
+        exit()
+
+    if sys.argv[3] not in {"TRAIN", "LOAD"}:     
+        print("USAGE: python model.py <Model Type> <Training Type> <Train/Load>")
+        print("<Train/Load>: [TRAIN/LOAD]")
+        exit()
 
     # create model based on parameter
     if sys.argv[1] == "CONV":
@@ -232,24 +250,27 @@ def main():
     elif sys.argv[1] == "DENSE":
         model = Model()  
 
-    # load weights, if you'd like
-    # model.classifier.load_weights('whole_model_weights')    
+    # load weights
+    if sys.argv[3] == "LOAD":
+        whole_model_path = input("Path to weights (dir/weight_names): ")
+        load_classifier_model(model, whole_model_path)
 
-    # train based on input
-    if sys.argv[2] == "WHOLE":
-        history = train_whole_model(model, train_inputs, train_labels)
-    elif sys.argv[2] == "SPLIT":
-        train_siamese_network(model, train_inputs, train_labels)    
-        history = train_whole_model(model, train_inputs, train_labels)
-    elif sys.argv[2] == "FREEZESPLIT":
-        train_siamese_network(model, train_inputs, train_labels)   
-        history = train_whole_model(model, train_inputs, train_labels, freeze_siamese=True)
+    else:
+        # train based on input
+        if sys.argv[2] == "WHOLE":
+            history = train_whole_model(model, train_inputs, train_labels)
+        elif sys.argv[2] == "SPLIT":
+            train_siamese_network(model, train_inputs, train_labels)    
+            history = train_whole_model(model, train_inputs, train_labels)
+        elif sys.argv[2] == "FREEZESPLIT":
+            train_siamese_network(model, train_inputs, train_labels)   
+            history = train_whole_model(model, train_inputs, train_labels, freeze_siamese=True)
+        
+        # graph loss over training
+        visualize_data(history)   
 
     # test the model
-    print(test(model, test_inputs, test_labels))
-
-    # graph loss over training
-    visualize_data(history)    
+    test(model, test_inputs, test_labels)
   
 if __name__ == '__main__':
     main()
