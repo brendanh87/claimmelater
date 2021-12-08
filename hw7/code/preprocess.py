@@ -6,6 +6,12 @@ import tensorflow as tf
 
 # Builds a dictionary with three fields id pair and same, which each contain a list where each list index is a docpair
 def get_data(inputs_file_path, labels_file_path):
+    """
+    Takes the inputs and labels and returns an array with each entry's count vectorization.
+
+    :inputs_file_path: the file path of the inputs
+    :labels_file_path: the file path of the labels
+    """
 
     # get the number of examples
     count = 0
@@ -50,8 +56,14 @@ def get_data(inputs_file_path, labels_file_path):
     # return the dictionary, num_examples, and the features
     return count, features
 
-# to save time, this function reads the count-vectors.txt file to get the features
 def read_data(vectors_file_path, labels_file_path):
+    """
+    Reads the features and labels from given files.
+
+    :vectors_file_path: the file path to the vectors
+    :labels_file_path: the file path to the labels
+    """
+
     # get the features and labels from the .npy file
     features = np.load(vectors_file_path)
     labels = np.load(labels_file_path)
@@ -77,4 +89,4 @@ def read_data(vectors_file_path, labels_file_path):
 
     return train_inputs, test_inputs, train_labels, test_labels
 
-# TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
+# USER TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
