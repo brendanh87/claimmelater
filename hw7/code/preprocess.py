@@ -3,6 +3,7 @@ import numpy as np
 import json as js
 from sklearn.feature_extraction.text import CountVectorizer
 import tensorflow as tf
+import pickle
 
 # Builds a dictionary with three fields id pair and same, which each contain a list where each list index is a docpair
 def get_data(inputs_file_path, labels_file_path):
@@ -90,3 +91,12 @@ def read_data(vectors_file_path, labels_file_path):
     return train_inputs, test_inputs, train_labels, test_labels
 
 # USER TODO: run get_data() AFTER creating the files count-vectors.npy and labels.npy to load it on your device
+
+def vectorize(dict_file_path, target_text):
+    with open(dict_file_path, 'rb') as saved_dict:
+        dict = pickle.load(saved_dict)
+    
+    vectorizer = CountVectorizer(input='content', ngram_range=(1,3), analyzer='char', min_df=0.01, vocabulary = dict)
+    features = vectorizer.fit_transform(target_text).toarray()  
+
+    return features
