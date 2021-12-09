@@ -39,8 +39,13 @@ class Model(tf.keras.Model):
 
         # intialize hyperparameters and optimizer
         self.learning_rate = 0.001
+<<<<<<< HEAD
         self.epochs = 10
         self.siamese_epochs = 80
+=======
+        self.epochs = 100
+        self.siamese_epochs = 50
+>>>>>>> 92b965605926330312868ef60ce227b5db6d1c9b
         self.res_layer_count = 8
         self.embedding_size = (8736)
         self.batch_size = 120
@@ -81,7 +86,7 @@ class Model(tf.keras.Model):
                                    name = 'siamese')
         # classifier model
         z = layers.Subtract()([siameseA_output, siameseB_output])
-        z = Lambda(tf.math.abs)(z)
+        z = Lambda(tf.math.abs, name = "absolute")(z)
         z = layers.Dense(512, activation = 'relu')(z)
         z = layers.BatchNormalization()(z)
         z = layers.Dense(512, activation = 'relu')(z)
@@ -92,13 +97,14 @@ class Model(tf.keras.Model):
         # set up the cumulative classifier model
         self.classifier = keras.Model(inputs = [siameseA_input, siameseB_input], outputs = classifier_output, name = 'classifier')
 
-    def call(self, inputs):
+    def call(self, input_one, input_two):
         """
         Calls the model on a set of inputs
-        :param inputs: A list of two embedding_size vectors
+        :param input_one: first text to be compared, of size [num_texts, embedding_size]
+        :param input_two: second text to be compared, of size [num_texts, embedding_size]
         :return: A [0,1] float value representing confidence of whether the two inputs are from the same author
         """
-        return self.classifier([inputs[0], inputs[1]])
+        return self.classifier([input_one, input_two])
 
     def residual_block(self, input):
         """
@@ -108,7 +114,7 @@ class Model(tf.keras.Model):
         x = layers.BatchNormalization()(x)
         x = layers.Dense(512)(x)
         x = layers.BatchNormalization()(x)
-        x = layers.Subtract()([x, input])
+        x = layers.Add()([x, input]) #change this if using subtraction instead
         x = layers.Activation('relu')(x)
         return x  
 
