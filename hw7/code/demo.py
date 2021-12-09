@@ -3,7 +3,7 @@ from model import Model, load_classifier_model
 import string
 
 DICT_FILE_PATH = "output_dictionary.pkl"
-PATH_TO_WEIGHTS = "../../weights/split_model_weights/split_model_weights"
+PATH_TO_WEIGHTS = "whole_model_weights"
 PATH_TO_FILE_A = "robert.txt"
 PATH_TO_FILE_B = "deathlyhallows.txt"
 
