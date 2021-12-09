@@ -146,3 +146,5 @@ hw7/.DS_Store
 hw7/code/.DS_Store
 requirements.txt
 hw7/code/extract_from_dataset.py
+hw7/DS_Store
+hw7/code/output_dictionary.pkl
