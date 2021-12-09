@@ -6,15 +6,9 @@ import tensorflow as tf
 import re
 
 DICT_FILE_PATH = "output_dictionary.pkl"
-<<<<<<< HEAD
 PATH_TO_WEIGHTS = "whole_model_weights"
-PATH_TO_FILE_A = "robert.txt"
-PATH_TO_FILE_B = "melville.txt"
-=======
-PATH_TO_WEIGHTS = "../../weights/100_whole_addition/whole_model_weights"
 PATH_TO_FILE_A = "alice.txt"
 PATH_TO_FILE_B = "deathlyhallows.txt"
->>>>>>> 710ed45dd6117f2e6b1f45e6cf7ec0f6e722f5ef
 
 # def lower_n_unpunc(text):
 #     return text.translate(str.maketrans('','', string.punctuation)).replace('\n', ' ').replace("  "," ").lower()
