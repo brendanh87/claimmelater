@@ -39,8 +39,8 @@ class Model(tf.keras.Model):
 
         # intialize hyperparameters and optimizer
         self.learning_rate = 0.001
-        self.epochs = 10
-        self.siamese_epochs = 1
+        self.epochs = 20
+        self.siamese_epochs = 80
         self.res_layer_count = 8
         self.embedding_size = (8736)
         self.batch_size = 120
@@ -81,6 +81,7 @@ class Model(tf.keras.Model):
                                    name = 'siamese')
         # classifier model
         z = layers.Subtract()([siameseA_output, siameseB_output])
+        z = Lambda(tf.math.abs)(z)
         z = layers.Dense(512, activation = 'relu')(z)
         z = layers.BatchNormalization()(z)
         z = layers.Dense(512, activation = 'relu')(z)
