@@ -1,7 +1,7 @@
 ## Who Let the Cats Out?
 CSCI1470 Fall 2021, Brendan Ho and Alyssa Loo
 
-# TRAINING THE MODEL
+# Training the model
 - Have the `labels.npy` and `count_vectors.npy` files downloaded from our GCP bucket.
 - Run the `model.py` file with arguments in the command line, in the format 
 ```
@@ -14,7 +14,8 @@ python model.py <Model Type> <Training Type> <Train/Load>
 For example
 ```python model.py DENSE WHOLE TRAIN```
 
-# CALLING THE MODEL FOR PREDICTIONS
+# Calling model for predictions
+- Prepare two .txt files with the target texts for prediction. For best resuts, ensure there are at least 10 000 characters in both of them.
 - Have the `output_dictionary.pkl` file downloaded from our GCP bucket.
 - Open the `demo.py` file. Replace the definitions at the top of the files with the right paths to the requested objects.
 - Run the `demo.py` file.
