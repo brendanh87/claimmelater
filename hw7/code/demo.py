@@ -7,8 +7,8 @@ import re
 
 DICT_FILE_PATH = "output_dictionary.pkl"
 PATH_TO_WEIGHTS = "../../weights/100_whole_addition/whole_model_weights"
-PATH_TO_FILE_A = "alice.txt"
-PATH_TO_FILE_B = "deathlyhallows.txt"
+PATH_TO_FILE_A = "../demo_data/austen_pnp.txt"
+PATH_TO_FILE_B = "../demo_data/twain_huckfinn.txt"
 
 # def lower_n_unpunc(text):
 #     return text.translate(str.maketrans('','', string.punctuation)).replace('\n', ' ').replace("  "," ").lower()
