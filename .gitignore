@@ -133,3 +133,16 @@ data/
 
 hw7/code/labels.npy
 hw7/code/count-vectors.npy
+hw7/code/siamese_model_weights.data-00000-of-00001
+hw7/code/siamese_model_weights.index
+hw7/code/split-weights-100epochs.txt
+hw7/code/split_model_weights.data-00000-of-00001
+hw7/code/split_model_weights.index
+hw7/code/output_dictionary.pkl
+hw7/code/checkpoint
+weights
+.DS_Store
+hw7/.DS_Store
+hw7/code/.DS_Store
+requirements.txt
+hw7/code/extract_from_dataset.py
