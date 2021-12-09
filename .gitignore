@@ -133,3 +133,5 @@ data/
 
 hw7/code/labels.npy
 hw7/code/count-vectors.npy
+hw7/DS_Store
+hw7/code/output_dictionary.pkl

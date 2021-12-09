@@ -39,13 +39,8 @@ class Model(tf.keras.Model):
 
         # intialize hyperparameters and optimizer
         self.learning_rate = 0.001
-<<<<<<< HEAD
-        self.epochs = 10
-        self.siamese_epochs = 80
-=======
         self.epochs = 100
         self.siamese_epochs = 50
->>>>>>> 92b965605926330312868ef60ce227b5db6d1c9b
         self.res_layer_count = 8
         self.embedding_size = (8736)
         self.batch_size = 120
