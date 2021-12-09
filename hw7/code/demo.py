@@ -5,9 +5,9 @@ import numpy as np
 import tensorflow as tf
 
 DICT_FILE_PATH = "output_dictionary.pkl"
-PATH_TO_WEIGHTS = "../../weights/100_whole_addition/whole_model_weights"
-PATH_TO_FILE_A = "robert.txt"
-PATH_TO_FILE_B = "papertowns.txt"
+PATH_TO_WEIGHTS = "../../weights/100_whole_subtraction/whole_model_weights"
+PATH_TO_FILE_A = "pridenprejudice.txt"
+PATH_TO_FILE_B = "persuasion.txt"
 
 def lower_n_unpunc(text):
     return text.translate(str.maketrans('','', string.punctuation)).replace('\n', ' ').replace("  "," ").lower()
