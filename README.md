@@ -19,8 +19,8 @@ For example
 - Prepare two .txt files with the target texts for prediction. For best resuts, ensure there are at least 10 000 characters in both of them. There are some sample .txt files in the `hw7/demo_data` folder
 - Have the `output_dictionary.pkl` file downloaded from our GCP bucket.
   - Direct download link: [output_dictionary.pkl (134.4KB)](https://storage.googleapis.com/claimmelater-trained-weights/output_dictionary.pkl)
-- Have a saved set of weights. You can training the model yourself (above), or download these pre-trained set of weights:
-  - Direct download link (all three files must be in the same directory for Tensorflow to load saved weights: 
+- Have a saved set of weights. You can train the model yourself (above), or download these pre-trained set of weights (whole-trained, all dense layers, addition in resblock):
+  - Direct download link (all three files must be in the same directory for Tensorflow to load saved weights): 
     - [checkpoint (95B)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/checkpoint)
     - [.data (108.9MB)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/whole_model_weights.data-00000-of-00001)
     - [.index (19KB)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/whole_model_weights.index)
