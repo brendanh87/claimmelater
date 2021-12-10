@@ -20,7 +20,10 @@ For example
 - Have the `output_dictionary.pkl` file downloaded from our GCP bucket.
   - Direct download link: [output_dictionary.pkl (134.4KB)](https://storage.googleapis.com/claimmelater-trained-weights/output_dictionary.pkl)
 - Have a saved set of weights. You can training the model yourself (above), or download these pre-trained set of weights:
-  - Direct download link (all three files must be in the same directory for Tensorflow to load saved weights: [checkpoint (95B)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/checkpoint) | [.index (19KB)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/whole_model_weights.index) | [.data (108.9MB)] (https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/whole_model_weights.data-00000-of-00001)
+  - Direct download link (all three files must be in the same directory for Tensorflow to load saved weights: 
+    - [checkpoint (95B)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/checkpoint)
+    - [.index (19KB)](https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/whole_model_weights.index)
+    - [.data (108.9MB)] (https://storage.googleapis.com/claimmelater-trained-weights/whole_model_weights_addition/whole_model_weights.data-00000-of-00001)
 - Open the `demo.py` file. Replace the definitions at the top of the files with the right paths to the requested objects.
   - For the path to the weights, it should be formatted as `directorypath/weightname`, where weightname is the prefix before `.index` and `.data[...]`
 - Run the `demo.py` file.
