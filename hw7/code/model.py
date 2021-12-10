@@ -38,7 +38,7 @@ class Model(tf.keras.Model):
         super(Model, self).__init__()
 
         # intialize hyperparameters and optimizer
-        self.learning_rate = 0.0001
+        self.learning_rate = 0.001
         self.epochs = 80
         self.siamese_epochs = 20
         self.res_layer_count = 8
@@ -186,7 +186,7 @@ def train_siamese_network(model, train_inputs, train_labels):
     """
     Train the siamese network for the specified number of epochs.
 
-    :param model: the model
+    :param model: the modelop9iZX aw5
     :param train_inputs: training inputs in the shape (batch_size, 2, 8736)
     :param train_labels: training labels in the shape (batch_size)
     :return siamese_history: history of the siamese_network for visualization
