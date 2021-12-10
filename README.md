@@ -1,7 +1,8 @@
-## Who Let the Cats Out?
+# Who Let the Cats Out?
 CSCI1470 Fall 2021, Brendan Ho and Alyssa Loo
 
-### [Final Writeup](https://docs.google.com/document/d/1SldKaEAevO9QALDZy1KmQJWis0di8VJpq5rGMoytfpM/edit?usp=sharing) | [Poster] (https://docs.google.com/presentation/d/1NEXjwr2Q5dsh8_qjlTJOBcEelxZyKfjKr29CO-FsW24/edit?usp=sharing)
+### [Final Writeup](https://docs.google.com/document/d/1SldKaEAevO9QALDZy1KmQJWis0di8VJpq5rGMoytfpM/edit?usp=sharing)
+### [Poster] (https://docs.google.com/presentation/d/1NEXjwr2Q5dsh8_qjlTJOBcEelxZyKfjKr29CO-FsW24/edit?usp=sharing)
 # Training the model
 - Have the `labels.npy` and `count_vectors.npy` files downloaded from our GCP bucket. 
 - Direct download links: [count-vectors.npy (6.8GB) ](https://storage.googleapis.com/claimmelater-trained-weights/count-vectors.npy)| [labels.npy (51.5KB)](https://storage.googleapis.com/claimmelater-trained-weights/labels.npy)
